@@ -6,9 +6,15 @@
 //
 
 import Foundation
+struct Response: Decodable {
+    let record: Record
+}
 
-// Структура данных пользователей
-struct UserData: Decodable {
+struct Record: Decodable {
+    let data: DataClass
+}
+
+struct DataClass: Decodable {
     let users: [User]
 }
 

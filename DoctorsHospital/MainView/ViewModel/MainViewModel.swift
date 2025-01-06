@@ -7,27 +7,26 @@
 
 import SwiftUI
 
-extension MainView {
-    @Observable
-    class MainViewModel {
-        var listDoctors: [User] = []
+    
+    class MainViewModel:ObservableObject {
+        @Published  var listDoctors: [User] = []
         var searchText: String = ""
         
-        func loadUsersFromJSON() -> [User]? {
+        func loadUsersFromJSON()  {
             guard let url = Bundle.main.url(forResource: "655b754e0574da7622c94aa4", withExtension: "json") else {
                 print("Failed to locate users.json in bundle.")
-                return nil
+                return
             }
             do {
                 let data = try Data(contentsOf: url)
                 let decoder = JSONDecoder()
-                let users = try decoder.decode([User].self, from: data)
-                self.listDoctors = users
-                return users
+                let users = try decoder.decode(Response.self, from: data)
+                self.listDoctors = users.record.data.users
+              
             } catch {
                 print("Failed to load or decode JSON: \(error.localizedDescription)")
-                return nil
+                return 
             }
         }
     }
-}
+

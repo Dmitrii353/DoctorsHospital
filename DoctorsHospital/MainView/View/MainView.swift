@@ -8,12 +8,9 @@
 import SwiftUI
 
 struct MainView: View {
-    @State var vm = MainViewModel()
+    @StateObject var vm = MainViewModel()
     
-    let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
+    let columns = [GridItem(.flexible())]
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
@@ -43,18 +40,23 @@ struct MainView: View {
                     
                 }
                 .padding()
-                
-                if vm.listDoctors.isEmpty {
-                                    // Показ индикатора загрузки, пока данные не загружены
-                                    VStack {
-                                        ProgressView("Загрузка врачей...")
-                                            .padding()
-                                        Spacer()
-                                    }
-                } else {
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(vm.listDoctors) { user in
-//                            UserCardView(user: user)
+                .onAppear {
+                    vm.loadUsersFromJSON()
+                }
+                VStack {
+                    if vm.listDoctors.isEmpty {
+                        // Показ индикатора загрузки, пока данные не загружены
+                        VStack {
+                            ProgressView("Загрузка врачей...")
+                                .padding()
+                            Spacer()
+                        }
+                    } else {
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(vm.listDoctors) { user in
+                                UserCardView(user: user)
+                                    .padding(.horizontal,30)
+                            }
                         }
                     }
                 }
@@ -82,57 +84,91 @@ struct MainView: View {
 }
 
 
-//struct UserCardView: View {
-//    let user: User
-//
-//    var body: some View {
-//        VStack(alignment: .leading, spacing: 8) {
-//            // Аватар
-//            if let avatar = user.avatar, let url = URL(string: avatar) {
-//                AsyncImage(url: url) { image in
-//                    image
-//                        .resizable()
-//                        .aspectRatio(contentMode: .fill)
-//                        .frame(width: 100, height: 100)
-//                        .clipShape(Circle())
-//                } placeholder: {
-//                    ProgressView()
-//                }
-//            } else {
-//                Circle()
-//                    .fill(Color.gray.opacity(0.5))
-//                    .frame(width: 100, height: 100)
-//                    .overlay(Text("Нет фото").font(.caption).foregroundColor(.white))
-//            }
-//
-//           //  Имя врача
-//            Text("\(user.firstName) \(user.lastName)")
-//                .font(.headline)
-//                .lineLimit(1)
-////
-////            // Рейтинг
-//            if let rating = user.ratings.count{
-//                Text("⭐️ \(String(format: "%.1f", rating))")
-//                    .font(.subheadline)
-//            }
-//
-//            // Специализация
-//            if let specialization = user.specialization.first {
-//                Text("specialization")
-//                    .font(.footnote)
-//                    .foregroundColor(.gray)
-//            }
-//
-//            // Научная степень
-//            if let degree = user.scientificDegreeLabel {
-//                Text(degree)
-//                    .font(.footnote)
-//                    .foregroundColor(.pink)
-//            }
-//        }
-//        .padding()
-//        .background(Color(.systemBackground))
-//        .cornerRadius(8)
-//        .shadow(color: .gray.opacity(0.3), radius: 4, x: 0, y: 2)
-//    }
-//}
+struct UserCardView: View {
+    @State var user: User
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Верхняя строка с аватаром, именем и кнопкой избранного
+            HStack {
+                if let avatar = user.avatar, let url = URL(string: avatar) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 50, height: 50)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        ProgressView()
+                    }
+                } else {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 50, height: 50)
+                        .foregroundStyle(Color.gray.opacity(0.9))
+                }
+                
+                // Имя врача
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(user.firstName ?? "Неизвестно")
+                        .font(.headline)
+                    Text("\(user.lastName ?? "") \(user.patronymic ?? "") ")
+                        .font(.headline)
+                    
+                    // Рейтинг
+//                    HStack(spacing: 2) {
+//                        ForEach(0..<5) { index in
+//                            Image(systemName: index < user.rating ? "star.fill" : "star")
+//                                .resizable()
+//                                .frame(width: 12, height: 12)
+//                                .foregroundStyle(Color.pink)
+//                        }
+//                    }
+                }
+                
+                Spacer()
+                
+                // Кнопка избранного
+                Button {
+                    user.isFavorite?.toggle()
+                } label: {
+                    Image(systemName: user.isFavorite == true ? "heart.fill" : "heart")
+                        .foregroundStyle(Color.red)
+                        .font(.title2)
+                }
+            }
+            
+            // Дополнительная информация: специализация, опыт
+            VStack(alignment: .leading, spacing: 5) {
+                Text("\(user.specialization.first?.name ?? "Педиатр") · стаж \(user.workExperience.count) лет")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                
+                Text("от \(user.videoChatPrice ?? 0) ₽")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.black)
+            }
+            
+            // Кнопка записи
+            Button(action: {
+                // Обработка кнопки записи
+            }) {
+                Text((user.nearestReceptionTime != nil) ? "Записаться" : "Нет свободного расписания")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(user.nearestReceptionTime != nil ? Color.pearchPink : Color.gray)
+                    .cornerRadius(8)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(8)
+        .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
+        .frame(maxWidth: .infinity)
+    }
+}
