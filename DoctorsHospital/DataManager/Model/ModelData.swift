@@ -13,76 +13,105 @@ struct UserData: Decodable {
 }
 
 // Структура пользователя
-struct User: Decodable {
-    let firstName: String
-    let lastName: String
-    let genderLabel: String
+struct User: Decodable, Identifiable {
+    let id: String
+    let slug: String?
+    let firstName: String?
+    let patronymic: String?
+    let lastName: String?
+    let gender: String?
+    let genderLabel: String?
     let specialization: [Specialization]
     let ratings: [Rating]
-    let ratingsRating: Double
-    let seniority: Int
-    let textChatPrice: Int
-    let videoChatPrice: Int
-    let homePrice: Int
-    let hospitalPrice: Int
+    let rankLabel: String?
+    let scientificDegreeLabel: String?
+    let categoryLabel: String?
     let avatar: String?
-    let nearestReceptionTime: Int?
-    let freeReceptionTime: [String]
-    let educationTypeLabel: String?
-    let higherEducation: [HigherEducation]
+    let higherEducation: [Education]
     let workExperience: [WorkExperience]
     let advancedTraining: [AdvancedTraining]
-    let rank: Int
-    let rankLabel: String
-    let scientificDegree: Int
-    let scientificDegreeLabel: String
-    let category: Int
-    let categoryLabel: String
-    let isFavorite: Bool
+    let videoChatPrice: Int?
+    var isFavorite: Bool?
+    
+    let nearestReceptionTime: TimeInterval?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, slug, firstName = "first_name", patronymic, lastName = "last_name"
+        case gender, genderLabel = "gender_label"
+        case specialization, ratings
+        case rankLabel = "rank_label"
+        case scientificDegreeLabel = "scientific_degree_label"
+        case categoryLabel = "category_label"
+        case avatar, higherEducation = "higher_education"
+        case workExperience = "work_expirience"
+        case advancedTraining = "advanced_training"
+        case videoChatPrice = "video_chat_price"
+        case isFavorite = "is_favorite"
+        case nearestReceptionTime = "nearest_reception_time"
+    }
 }
 
-// Специализация
 struct Specialization: Decodable {
+    let name: String?
     let id: Int
-    let name: String
-    let isModerated: Bool
+    let isModerated: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, name
+        case isModerated = "is_moderated"
+    }
 }
 
-// Рейтинг
 struct Rating: Decodable {
     let id: Int
-    let name: String
+    let name: String?
+    let value: Double?
 }
 
-// Высшее образование
-struct HigherEducation: Decodable {
+struct Education: Decodable {
     let id: Int
-    let university: String
-    let specialization: String
-    let qualification: String
-    let startDate: Int
-    let endDate: Int
-    let untilNow: Bool
-    let isModerated: Bool
+    let university: String?
+    let specialization: String?
+    let qualification: String?
+    let startDate: TimeInterval?
+    let endDate: TimeInterval?
+    let untilNow: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, university, specialization, qualification
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case untilNow = "until_now"
+    }
 }
 
-// Опыт работы
 struct WorkExperience: Decodable {
     let id: Int
-    let organization: String
-    let position: String
-    let startDate: Int
-    let endDate: Int?
-    let untilNow: Bool
-    let isModerated: Bool
+    let organization: String?
+    let position: String?
+    let startDate: TimeInterval?
+    let endDate: TimeInterval?
+    let untilNow: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, organization, position
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case untilNow = "until_now"
+    }
 }
 
-// Повышение квалификации
 struct AdvancedTraining: Decodable {
     let id: Int
-    let course: String
-    let institution: String
-    let startDate: Int
-    let endDate: Int?
-    let isModerated: Bool
+    let course: String?
+    let startDate: TimeInterval?
+    let endDate: TimeInterval?
+    let untilNow: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, course
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case untilNow = "until_now"
+    }
 }
