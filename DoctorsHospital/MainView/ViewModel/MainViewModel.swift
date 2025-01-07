@@ -10,6 +10,7 @@ import SwiftUI
     
     class MainViewModel:ObservableObject {
         @Published var selectedType: SortedType = .price
+        @Published var isAscending: Bool = false
         @Published var listDoctors: [User] = []
         @Published var filteredDoctors: [User] = []
         @Published var searchText: String = "" {
@@ -50,6 +51,28 @@ import SwiftUI
                         return fullName.lowercased().contains(searchText.lowercased())
                     }
                 }
+        }
+        
+        func sortDoctors() {
+                switch selectedType {
+                case .price:
+                    filteredDoctors.sort {
+                        isAscending ? ($0.videoChatPrice ?? 0) < ($1.videoChatPrice ?? 0) : ($0.videoChatPrice ?? 0) > ($1.videoChatPrice ?? 0)
+                    }
+                case .senority:
+                    filteredDoctors.sort {
+                        isAscending ? $0.workExperience.count < $1.workExperience.count : $0.workExperience.count > $1.workExperience.count
+                    }
+                case .rating:
+                    filteredDoctors.sort {
+                        isAscending ? ($0.ratings.first?.value ?? 0 < $1.ratings.first?.value ?? 0) : ($0.ratings.first?.value ?? 0 > $1.ratings.first?.value ?? 0)
+                    }
+                }
+            }
+        
+        func toggleSortOrder() {
+            isAscending.toggle()
+            sortDoctors()
         }
     }
 

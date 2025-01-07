@@ -9,36 +9,18 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject var vm = MainViewModel()
-    
+ 
     let columns = [GridItem(.flexible())]
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack {
-                    HStack(spacing: 0) {
-                        ForEach(SortedType.allCases, id: \.self) { sorting in
-                            Button {
-                                //
-                            } label: {
-                                Text(sorting.rawValue)
-                                    .font(.custom("Montserrat-Regular", size: 14))
-                                    .foregroundStyle(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical,10)
-                                    .clipped()
-                            }
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 0)
-                                    .stroke(Color(.systemGray6), lineWidth: 0.5))
-                            .background(Color(.pearchPink))
-                        }
-                        
+                    SortView(vm: vm, sortedType: $vm.selectedType) {
+                        vm.sortDoctors()
+                      
                     }
-                    .clipShape(.rect(cornerRadius: 8))
-                    .padding(.horizontal,10)
+                    .padding(.horizontal,15)
 
-                    
-                    
                 }
                 .padding(5)
                 
