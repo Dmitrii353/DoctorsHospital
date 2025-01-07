@@ -20,7 +20,7 @@ struct MainView: View {
                             Button {
                                 //
                             } label: {
-                                Text(sorting.title)
+                                Text(sorting.rawValue)
                                     .font(.custom("Montserrat-Regular", size: 14))
                                     .foregroundStyle(.white)
                                     .frame(maxWidth: .infinity)
@@ -35,14 +35,14 @@ struct MainView: View {
                         
                     }
                     .clipShape(.rect(cornerRadius: 8))
-                    
+                    .padding(.horizontal,10)
+
                     
                     
                 }
-                .padding()
-                .onAppear {
-                    vm.loadUsersFromJSON()
-                }
+                .padding(5)
+                
+                
                 VStack {
                     if vm.listDoctors.isEmpty {
                         // Показ индикатора загрузки, пока данные не загружены
@@ -53,12 +53,19 @@ struct MainView: View {
                         }
                     } else {
                         LazyVGrid(columns: columns, spacing: 10) {
-                            ForEach(vm.listDoctors) { user in
+                            ForEach(vm.filteredDoctors) { user in
                                 UserCardView(user: user)
                                     .padding(.horizontal,30)
                             }
                         }
                     }
+                }
+                .onAppear {
+                    vm.loadUsersFromJSON()
+                }
+                .searchable(text: $vm.searchText, prompt: "Поиск")
+                .onSubmit(of: .search ) {
+                    vm.searchDoctor()
                 }
         }
         .background(Color.colorTabView)
@@ -71,8 +78,7 @@ struct MainView: View {
             }
             
         }
-        .searchable(text: $vm.searchText, prompt: "Поиск")
-                    
+       
         
     }
         }
@@ -86,7 +92,6 @@ struct MainView: View {
 
 struct UserCardView: View {
     @State var user: User
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Верхняя строка с аватаром, именем и кнопкой избранного
@@ -108,49 +113,49 @@ struct UserCardView: View {
                         .frame(width: 50, height: 50)
                         .foregroundStyle(Color.gray.opacity(0.9))
                 }
+                    
                 
                 // Имя врача
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(user.firstName ?? "Неизвестно")
-                        .font(.headline)
-                    Text("\(user.lastName ?? "") \(user.patronymic ?? "") ")
-                        .font(.headline)
-                    
-                    // Рейтинг
-//                    HStack(spacing: 2) {
-//                        ForEach(0..<5) { index in
-//                            Image(systemName: index < user.rating ? "star.fill" : "star")
-//                                .resizable()
-//                                .frame(width: 12, height: 12)
-//                                .foregroundStyle(Color.pink)
-//                        }
-//                    }
+                    Text(user.lastName ?? "Неизвестно")
+                        .font(.system(size: 16,weight: .bold))
+                    Text("\(user.firstName ?? "") \(user.patronymic ?? "") ")
+                        .font(.system(size: 16,weight: .bold))
                 }
                 
+                   
                 Spacer()
                 
-                // Кнопка избранного
-                Button {
-                    user.isFavorite?.toggle()
-                } label: {
-                    Image(systemName: user.isFavorite == true ? "heart.fill" : "heart")
-                        .foregroundStyle(Color.red)
-                        .font(.title2)
+                
+                    // Кнопка избранного
+                    Button {
+                        user.isFavorite?.toggle()
+                    } label: {
+                        Image(systemName: user.isFavorite == true ? "heart.fill" : "heart")
+                            .foregroundStyle(Color.red)
+                            .font(.title2)
+                    }
+            }
+            HStack {
+                VStack(alignment: .leading,spacing: 10) {
+                    // Рейтинг
+                    StarRating(rating: user.ratings.first?.value ?? 0)
+                    // Дополнительная информация: специализация, опыт
+                    Text("\(user.specialization.first?.name ?? "Педиатр") · стаж \(user.workExperience.count) лет")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                    
+                    Text("от \(user.videoChatPrice ?? 0) ₽")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.black)
                 }
             }
+            .padding(.horizontal,60)
+
+               
             
-            // Дополнительная информация: специализация, опыт
-            VStack(alignment: .leading, spacing: 5) {
-                Text("\(user.specialization.first?.name ?? "Педиатр") · стаж \(user.workExperience.count) лет")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
-                
-                Text("от \(user.videoChatPrice ?? 0) ₽")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
-            }
-            
+            //}
             // Кнопка записи
             Button(action: {
                 // Обработка кнопки записи
@@ -168,7 +173,21 @@ struct UserCardView: View {
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(8)
-        .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
         .frame(maxWidth: .infinity)
+    }
+}
+
+struct StarRating: View {
+    let rating: Double
+    var body: some View {
+        
+        HStack(spacing: 2) {
+            ForEach(0..<5) { index in
+                Image(systemName: index < Int(rating) ? "star.fill" : "star")
+                    .resizable()
+                    .frame(width: 12, height: 12)
+                    .foregroundStyle(Color.pink)
+            }
+        }
     }
 }

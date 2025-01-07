@@ -9,8 +9,14 @@ import SwiftUI
 
     
     class MainViewModel:ObservableObject {
-        @Published  var listDoctors: [User] = []
-        var searchText: String = ""
+        @Published var selectedType: SortedType = .price
+        @Published var listDoctors: [User] = []
+        @Published var filteredDoctors: [User] = []
+        @Published var searchText: String = "" {
+            didSet {
+                searchDoctor()
+            }
+        }
         
         func loadUsersFromJSON()  {
             guard let url = Bundle.main.url(forResource: "655b754e0574da7622c94aa4", withExtension: "json") else {
@@ -22,11 +28,28 @@ import SwiftUI
                 let decoder = JSONDecoder()
                 let users = try decoder.decode(Response.self, from: data)
                 self.listDoctors = users.record.data.users
+                self.filteredDoctors = listDoctors
               
             } catch {
                 print("Failed to load or decode JSON: \(error.localizedDescription)")
                 return 
             }
+        }
+        
+        func searchDoctor() {
+            if searchText.isEmpty {
+                    filteredDoctors = listDoctors
+                } else {
+                    filteredDoctors = listDoctors.filter { user in
+                        let fullName = [
+                            user.firstName?.lowercased() ?? "",
+                            user.lastName?.lowercased() ?? "",
+                            user.patronymic?.lowercased() ?? ""
+                        ].joined(separator: " ")
+                        
+                        return fullName.lowercased().contains(searchText.lowercased())
+                    }
+                }
         }
     }
 

@@ -8,20 +8,10 @@
 import SwiftUI
 
 enum SortedType: String, CaseIterable {
-    case price
-    case senority
-    case rating
+    case price = "По цене"
+    case senority = "По стажу"
+    case rating = "По рейтингу"
     
-    var title: String {
-        switch self {
-        case .price:
-            return "По цене"
-        case .senority:
-            return "По стажу"
-        case .rating:
-            return "По рейтингу"
-        }
-    }
 }
 
 struct FilteredDoctors: View {
