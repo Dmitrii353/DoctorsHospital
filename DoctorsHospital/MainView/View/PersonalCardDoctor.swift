@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PersonalCardDoctor: View {
     var dataDoctors: User
-    
+    @State private var showPriceDetails = false
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -36,10 +36,12 @@ struct PersonalCardDoctor: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 10) {
-                            Text(dataDoctors.firstName ?? "Неизвестно")
-                                .font(.custom("Montserrat-Regular", size: 14))
-                            Text("\(dataDoctors.lastName ?? "") \(dataDoctors.patronymic ?? "")")
-                                .font(.custom("Montserrat-Regular", size: 14))
+                            Text(dataDoctors.lastName ?? "Неизвестно")
+                                .font(.custom("Montserrat-Regular", size: 16))
+                                .foregroundStyle(Color.black)
+                            Text("\(dataDoctors.firstName ?? "") \(dataDoctors.patronymic ?? "")")
+                                .font(.custom("Montserrat-Regular", size: 16))
+                                .foregroundStyle(Color.black)
                         }
                     }
                     
@@ -84,34 +86,30 @@ struct PersonalCardDoctor: View {
                             .foregroundStyle(Color.gray.opacity(0.8))
                     }
                     
-                    Button {
-                        //
-                    } label: {
-                        HStack {
-                            Text("Стоимость услуг")
-                                .font(.custom("Montserrat-Regular", size: 16))
-                            
-                            Spacer()
-                            
-                            Text("От \(dataDoctors.videoChatPrice ?? 0) ₽")
-                                .font(.custom("Montserrat-Regular", size: 16))
-                            
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.horizontal,15)
-                        .frame(height: 50)
-                        .background(Color.white)
-                        .clipShape(.rect(cornerRadius: 8))
-                        .padding(.top, 20)
-                    }
+                    NavigationLink(destination: PriceDetailsView(dataDoctors: dataDoctors)) {
+                                       HStack {
+                                           Text("Стоимость услуг")
+                                               .font(.custom("Montserrat-Regular", size: 16))
+                                               .foregroundStyle(Color.black)
+                                           Spacer()
+                                           Text("От \(dataDoctors.videoChatPrice ?? 0) ₽")
+                                               .font(.custom("Montserrat-Regular", size: 16))
+                                               .foregroundStyle(Color.black)
+                                       }
+                                       .frame(maxWidth: .infinity, alignment: .center)
+                                       .padding(.horizontal, 15)
+                                       .frame(height: 50)
+                                       .background(Color.white)
+                                       .clipShape(RoundedRectangle(cornerRadius: 8))
+                                       .padding(.top, 20)
+                                   }
+                   
                     
                     Text("Проводит диагностику и лечение терапевтических больных. Осуществляет расшифровку и снятие ЭКГ. Даёт рекомендации по диетологии. Доктор имеет опыт работы в России и за рубежом. Проводит консультации пациентов на английском языке.")
                         .font(.body)
                         .foregroundColor(.gray)
                     
                     Spacer()
-                    
-                    
                     
                 }
                 .frame(maxWidth: .infinity)
@@ -126,8 +124,8 @@ struct PersonalCardDoctor: View {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
                     }) {
-                        Image(systemName: "chevron.backward") // Стандартная иконка "назад"
-                            .foregroundColor(.black) // Измените цвет на желаемый
+                        Image(systemName: "chevron.backward")
+                            .foregroundColor(.black)
                     }
                     
                 }
