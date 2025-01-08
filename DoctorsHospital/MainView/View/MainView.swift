@@ -75,6 +75,7 @@ struct MainView: View {
 struct UserCardView: View {
     @State var user: User
     var body: some View {
+        NavigationLink(destination: PersonalCardDoctor(dataDoctors: user)) {
         VStack(alignment: .leading, spacing: 10) {
             // Верхняя строка с аватаром, именем и кнопкой избранного
             HStack {
@@ -95,7 +96,7 @@ struct UserCardView: View {
                         .frame(width: 50, height: 50)
                         .foregroundStyle(Color.gray.opacity(0.9))
                 }
-                    
+                
                 
                 // Имя врача
                 VStack(alignment: .leading, spacing: 5) {
@@ -105,18 +106,18 @@ struct UserCardView: View {
                         .font(.system(size: 16,weight: .bold))
                 }
                 
-                   
+                
                 Spacer()
                 
                 
-                    // Кнопка избранного
-                    Button {
-                        user.isFavorite?.toggle()
-                    } label: {
-                        Image(systemName: user.isFavorite == true ? "heart.fill" : "heart")
-                            .foregroundStyle(Color.red)
-                            .font(.title2)
-                    }
+                // Кнопка избранного
+                Button {
+                    user.isFavorite?.toggle()
+                } label: {
+                    Image(systemName: user.isFavorite == true ? "heart.fill" : "heart")
+                        .foregroundStyle(Color.red)
+                        .font(.title2)
+                }
             }
             HStack {
                 VStack(alignment: .leading,spacing: 10) {
@@ -134,8 +135,8 @@ struct UserCardView: View {
                 }
             }
             .padding(.horizontal,60)
-
-               
+            
+            
             
             //}
             // Кнопка записи
@@ -156,6 +157,7 @@ struct UserCardView: View {
         .background(Color(.systemBackground))
         .cornerRadius(8)
         .frame(maxWidth: .infinity)
+    }
     }
 }
 

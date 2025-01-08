@@ -98,12 +98,14 @@ struct WorkExperience: Decodable {
     let startDate: TimeInterval?
     let endDate: TimeInterval?
     let untilNow: Bool?
+    let scientificDegreeLabel: String?
     
     enum CodingKeys: String, CodingKey {
         case id, organization, position
         case startDate = "start_date"
         case endDate = "end_date"
         case untilNow = "until_now"
+        case scientificDegreeLabel = "scientific_degree_label"
     }
 }
 
